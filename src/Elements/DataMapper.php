@@ -73,8 +73,16 @@ abstract class DataMapper implements Mappable, \JsonSerializable
 							break;
 						}
 					}
-					if (!$filled && class_exists($propertyValueType)) {
-						$instance->{$propertyType} = new $propertyValueType($propertyValue);
+					if (!$filled) {
+						foreach ($propertyInfo->propertyTypes as $type) {
+							if (class_exists($type)) {
+								try {
+									$instance->{$propertyInfo->name} = new $type($propertyValue);
+								} catch (\Exception) {
+									continue;
+								}
+							}
+						}
 					}
 				}
 			}
