@@ -1,0 +1,47 @@
+{
+  "propertyString": "string value",
+  "propertyInt": 5,
+  "propertyArray": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "propertyItem": {
+    "propertyString": "string value",
+    "propertyInt": "5",
+    "propertyArray": {
+      "1": [],
+      "2": "some",
+      "3": "3",
+      "4": 4,
+      "5": null
+    },
+    "propertyDate": "2022-05-20 16:45"
+  },
+  "propertyArrayObjects": [
+    {
+      "propertyString": "string value",
+      "propertyInt": 5,
+      "propertyArray": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "propertyString": "string value",
+      "propertyInt": 5,
+      "propertyArray": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ]
+}
