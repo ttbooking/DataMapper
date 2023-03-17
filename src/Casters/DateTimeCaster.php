@@ -8,7 +8,7 @@ use DataMapper\Interfaces\InputCaster;
 use DataMapper\Interfaces\OutputCaster;
 use DateTime;
 use DateTimeInterface;
-use Exception;
+use Throwable;
 
 class DateTimeCaster implements InputCaster, OutputCaster
 {
@@ -50,8 +50,7 @@ class DateTimeCaster implements InputCaster, OutputCaster
 		if ($this->inputFormat) {
 			try {
 				$dateTime = $className::createFromFormat($this->inputFormat, $value);
-			} catch (Exception) {
-			}
+			} catch (Throwable) {}
 		}
 		return $dateTime ?: new $className($value);
 	}
