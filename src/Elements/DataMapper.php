@@ -18,6 +18,10 @@ abstract class DataMapper implements Mappable, \JsonSerializable
 	 */
 	public static function map(mixed $value): static
 	{
+		if ($value instanceof static) {
+			return unserialize(serialize($value));
+		}
+
 		if ($value instanceof stdClass) {
 			$value = (array)$value;
 		} else if (is_object($value)) {
