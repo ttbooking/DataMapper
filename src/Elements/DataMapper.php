@@ -16,7 +16,7 @@ abstract class DataMapper implements Mappable, \JsonSerializable
 	/**
 	 * @throws UnsupportedDataException
 	 */
-	public static function map(mixed $value): Mappable
+	public static function map(mixed $value): static
 	{
 		if ($value instanceof stdClass) {
 			$value = (array)$value;
@@ -48,28 +48,33 @@ abstract class DataMapper implements Mappable, \JsonSerializable
 				if (in_array($propertyValueType, $propertyInfo->propertyTypes)) {
 					$instance->{$propertyInfo->name} = $propertyValue;
 				} else {
+					$filled = false;
 					foreach ($propertyInfo->propertyTypes as $propertyType) {
-
-						if ($propertyValueType)
-
-							if (in_array($propertyValueType, [
-								'boolean', 'bool',
-								'integer', 'int',
-								'float', 'double',
-								'string'
-							])) {
-								$instance->{$propertyInfo->name} = $propertyValue;
-								break;
-							} else if ($propertyType === 'array') {
-								$instance->{$propertyInfo->name} = (array)$propertyValue;
-								break;
-							} else if (is_a($propertyType, Mappable::class, true)) {
-								$instance->{$propertyInfo->name} = $propertyType::map($propertyValue);
-								break;
-							} else if ($propertyValue instanceof $propertyType) {
-								$instance->{$propertyInfo->name} = $propertyValue;
-								break;
-							}
+						if (in_array($propertyValueType, [
+							'boolean', 'bool',
+							'integer', 'int',
+							'float', 'double',
+							'string'
+						])) {
+							$instance->{$propertyInfo->name} = $propertyValue;
+							$filled = true;
+							break;
+						} else if ($propertyType === 'array') {
+							$instance->{$propertyInfo->name} = (array)$propertyValue;
+							$filled = true;
+							break;
+						} else if (is_a($propertyType, Mappable::class, true)) {
+							$instance->{$propertyInfo->name} = $propertyType::map($propertyValue);
+							$filled = true;
+							break;
+						} else if ($propertyValue instanceof $propertyType) {
+							$instance->{$propertyInfo->name} = $propertyValue;
+							$filled = true;
+							break;
+						}
+					}
+					if (!$filled && class_exists($propertyValueType)) {
+						$instance->{$propertyType} = new $propertyValueType($propertyValue);
 					}
 				}
 			}
