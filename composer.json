@@ -1,16 +1,16 @@
 {
   "name": "ttbooking/data-mapper",
-  "description": "description",
+  "description": "map data into typed objects",
   "minimum-stability": "stable",
-  "license": "proprietary",
+  "license": "MIT",
   "authors": [
     {
-      "name": "Program",
-      "email": "email@example.com"
+      "name": "a.romashov",
+      "email": "a.romashov@ttbooking.ru"
     }
   ],
   "require": {
-    "php": "^8.0|^8.1|^8.2"
+    "php": "^8.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^10.0"

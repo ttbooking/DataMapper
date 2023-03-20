@@ -13,8 +13,6 @@ class PropertyInfo
 
 	/** @var list<AttributeAction> */
 	public array $attributeActions = [];
-
-
 	public SerializationInfo $serializationInfo;
 
 	public function __construct()

@@ -24,19 +24,33 @@ class DataMapperTest extends TestCase
 		$this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), json_encode($mapped, JSON_PRETTY_PRINT));
 	}
 
+	public function testMapperObject() {
+		$class = $this->getTestClass();
+		$data = json_decode(json_encode($this->getTestData()));
+		$mapped = $class::map($data);
+		$this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), json_encode($mapped, JSON_PRETTY_PRINT));
+	}
+
+	public function testMapperMapped() {
+		$class = $this->getTestClass();
+		$data = $this->getTestData();
+		$mapped = $class::map($class::map($data));
+		$this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), json_encode($mapped, JSON_PRETTY_PRINT));
+	}
+
 	public function testPerformanceMap()
 	{
 		$class = $this->getTestClass();
 		$data = $this->getTestData();
 
 		$time = 0;
-		$range = range(1, 100_000);
+		$range = range(1, 10_000);
 		foreach ($range as $i) {
 			$mark = microtime(true);
 			$class::map($data);
 			$time += microtime(true) - $mark;
 		}
-		$this->assertLessThan(3, $time);
+		$this->assertLessThan(.3, $time);
 	}
 
 	public function testPerformanceToArray()
@@ -45,14 +59,14 @@ class DataMapperTest extends TestCase
 		$data = $this->getTestData();
 
 		$time = 0;
-		$range = range(1, 100_000);
+		$range = range(1, 10_000);
 		foreach ($range as $i) {
 			$mapped = $class::map($data);
 			$mark = microtime(true);
 			$mapped->toArray();
 			$time += microtime(true) - $mark;
 		}
-		$this->assertLessThan(3, $time);
+		$this->assertLessThan(.3, $time);
 	}
 
 	public function getTestData(): array
