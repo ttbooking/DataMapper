@@ -36,9 +36,19 @@ class DateTimeCaster implements InputCaster, OutputCaster
 					return $value;
 				}
 			}
+
+			foreach ($propertyInfo->propertyTypes as $propertyType) {
+				try {
+					return new $propertyType($value);
+				} catch (Throwable) {
+					continue;
+				}
+			}
+
 			throw new CannotCastException(
 				'expected ' . implode('|', $propertyInfo->propertyTypes) . ', but got ' . $value::class
 			);
+
 		} else {
 			foreach ($propertyInfo->propertyTypes as $propertyType) {
 				if (is_a($propertyType, DateTimeInterface::class, true)) {
