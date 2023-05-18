@@ -11,13 +11,20 @@ class IgnoresSerializationAttributeTest extends TestCase
 	public function testIgnoreSerialization() {
 		$data = [
 			'some' => 'one',
+			'some2' => null,
+			'some3' => 0,
 		];
 		$class = new class extends DataMapper {
 			#[IgnoresSerialization]
 			public string $some;
+			#[IgnoresSerialization(IgnoresSerialization::NULL)]
+			public ?string $some2;
+			#[IgnoresSerialization(IgnoresSerialization::EMPTY)]
+			public ?int $some3;
 		};
 		$mapped = $class::map($data);
 		$this->assertSame($data['some'], $mapped->some);
+		$this->assertSame($data['some3'], $mapped->some3);
 		$this->assertEmpty($mapped->toArray());
 	}
 }

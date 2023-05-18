@@ -2,6 +2,8 @@
 
 namespace DataMapper\Services;
 
+use BackedEnum;
+
 class ArraySerializer
 {
 	public static function toArray($value)
@@ -18,6 +20,8 @@ class ArraySerializer
 					return $value->jsonSerialize();
 				} else if (method_exists($value, 'toArray')) {
 					return $value->toArray();
+				} else if ($value instanceof BackedEnum) {
+					return $value->value;
 				} else {
 					$value = (array)$value;
 				}

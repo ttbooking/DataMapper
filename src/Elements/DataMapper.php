@@ -2,6 +2,7 @@
 
 namespace DataMapper\Elements;
 
+use DataMapper\Attributes\IgnoresSerialization;
 use DataMapper\Exceptions\UnsupportedDataException;
 use DataMapper\Interfaces\Mappable;
 use DataMapper\Services\ArraySerializer;
@@ -60,11 +61,23 @@ abstract class DataMapper implements Mappable, \JsonSerializable
 
 		$result = [];
 		foreach ($propertyInfos as $propertyInfo) {
-			if ($propertyInfo->serializationInfo->ignoresSerialization) {
-				continue;
-			}
-			$propertySerializeName = $propertyInfo->serializationInfo->serializeToName ?? $propertyInfo->name;
+
 			$value = $this->{$propertyInfo->name} ?? null;
+
+			if ($propertyInfo->serializationInfo->ignoresSerialization) {
+
+				$ignore = match ($propertyInfo->serializationInfo->ignoreIf) {
+					IgnoresSerialization::ANY => true,
+					IgnoresSerialization::NULL => is_null($value),
+					IgnoresSerialization::EMPTY => empty($value),
+				};
+
+				if ($ignore) {
+					continue;
+				}
+			}
+
+			$propertySerializeName = $propertyInfo->serializationInfo->serializeToName ?? $propertyInfo->name;
 
 
 			foreach ($propertyInfo->serializationInfo->outputCasters as $caster) {

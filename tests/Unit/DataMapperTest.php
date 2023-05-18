@@ -108,16 +108,19 @@ class DataMapperTest extends TestCase
 										]
 									]
 								],
-							]
+							],
 						]
-					]
+					],
+					'someValue' => 'value2',
 				],
-			]
+			],
+			'someValue' => 'value1',
 		];
 	}
 
 	public function getTestClass(): DataMapper
 	{
+
 		return new class extends DataMapper {
 			public string $fruit;
 			public int $count;
@@ -127,6 +130,12 @@ class DataMapperTest extends TestCase
 			public array $combinations = [];
 			#[IgnoresSerialization]
 			public ?string $some = 'something string';
+			#[IgnoresSerialization(IgnoresSerialization::NULL)]
+			public ?Some $someValue = null;
 		};
 	}
+}
+enum Some: string {
+	case VALUE1 = 'value1';
+	case VALUE2 = 'value2';
 }

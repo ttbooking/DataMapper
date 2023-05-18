@@ -3,6 +3,7 @@
 namespace DataMapper\Attributes;
 
 use Attribute;
+use BackedEnum;
 use DataMapper\Elements\ObjectInfo\PropertyInfo;
 use DataMapper\Exceptions\CannotCastException;
 use DataMapper\Interfaces\AttributeAction;
@@ -30,12 +31,19 @@ class ManyOf implements AttributeAction
 				$result[$k] = SimpleTypeHelper::castSimpleType($this->type, $item);
 			}
 			return $result;
-		} else if (!is_a($this->type, Mappable::class, true)) {
-			throw new CannotCastException(
-				'expected simple type or class name implements Mappable, but got ' . $this->type
-			);
+		} else if (is_a($this->type, BackedEnum::class, true)) {
+			$result = [];
+			foreach ($value as $k => $item) {
+				$result[$k] = $this->type::tryFrom($item);
+			}
+			return $result;
+		} else if (is_a($this->type, Mappable::class, true)) {
+			return $this->type::mapMany($value);
 		}
 
-		return $this->type::mapMany($value);
+		throw new CannotCastException(
+			'expected simple type or class name implements Mappable, but got ' . $this->type
+		);
+
 	}
 }

@@ -2,6 +2,7 @@
 
 namespace DataMapper\Services;
 
+use BackedEnum;
 use DataMapper\Elements\ObjectInfo\PropertyInfo;
 use DataMapper\Interfaces\Mappable;
 use Throwable;
@@ -38,6 +39,14 @@ class FieldCaster
 					 * В случае если тип значения простой и тип поля простой, то однозначно можем установить
 					 */
 					return SimpleTypeHelper::castSimpleType($propertyType, $value);
+				} else if (is_a($propertyType, BackedEnum::class, true)) {
+					/**
+					 * Пробуем получить enum из значения
+					 */
+					$result = $propertyType::tryFrom($value);
+					if ($result) {
+						return $result;
+					}
 				} else if ($propertyType === 'array') {
 					/**
 					 * Если тип свойства массив, то преобразуем к массиву

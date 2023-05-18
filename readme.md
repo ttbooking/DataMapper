@@ -69,8 +69,8 @@ class Example extends DataMapper {
 }
 $item = Example::map(['integers' => ['1', 3, '5', '0']]);
 /**
- * $item->values = [1, 3, 5, 0];
- * $item->toArray() = ['integerValues' => [1, 3, 5, 0]]
+ * $item->values === [1, 3, 5, 0];
+ * $item->toArray() === ['integerValues' => [1, 3, 5, 0]]
  */
 ```
 #### IgnoresSerialization ####
@@ -81,11 +81,23 @@ $item = Example::map(['integers' => ['1', 3, '5', '0']]);
 Аттрибут принимает значение имя класса реализующего InputCaster или 
 OutputCaster
 ##### DateTimeCaster #####
+
+2 параметра 
 ```php
+use DataMapper\Attributes\Caster;
+use DataMapper\Casters\DateTimeCaster;
+
 class Example extends DataMapper {
-    #[ManyOf('int'), FromName('integers'), ToName('integerValues')]
-    public array $values;
+    //              формат входящей даты, формат сериализации, часовой пояс
+    #[Caster(DateTimeCaster::class, 'Y-m-d', 'd.m.Y', 'Europe/Kaliningrad')]
+    public Carbon $date;
 }
+
+$example = Example::map([
+    'date' => '20.11.2020'
+]);
+
+$example->toJson(); // {"date": "2020-11-20"}
 
 ```
 ### Несколько типов (Union types) ###
