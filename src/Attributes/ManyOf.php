@@ -8,6 +8,7 @@ use DataMapper\Elements\ObjectInfo\PropertyInfo;
 use DataMapper\Exceptions\CannotCastException;
 use DataMapper\Interfaces\AttributeAction;
 use DataMapper\Interfaces\Mappable;
+use DataMapper\Services\ArraySerializer;
 use DataMapper\Services\SimpleTypeHelper;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -38,7 +39,7 @@ class ManyOf implements AttributeAction
 			}
 			return $result;
 		} else if (is_a($this->type, Mappable::class, true)) {
-			return $this->type::mapMany($value);
+			return $this->type::mapMany(ArraySerializer::toArray($value));
 		}
 
 		throw new CannotCastException(
