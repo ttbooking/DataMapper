@@ -6,7 +6,7 @@ use Attribute;
 use DataMapper\Elements\ObjectInfo\PropertyInfo;
 use DataMapper\Interfaces\AttributeAction;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY|Attribute::TARGET_CLASS)]
 class IgnoresSerialization implements AttributeAction
 {
 	const ANY = 'any';

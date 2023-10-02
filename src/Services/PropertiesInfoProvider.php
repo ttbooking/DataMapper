@@ -5,6 +5,7 @@ namespace DataMapper\Services;
 use DataMapper\Elements\ObjectInfo\PropertyInfo;
 use DataMapper\Interfaces\AttributeAction;
 use ReflectionAttribute;
+use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionProperty;
@@ -23,11 +24,14 @@ class PropertiesInfoProvider
 
 		if (empty($cache[$instance::class])) {
 			$result = [];
-			$reflectionClass = new \ReflectionClass($instance);
+			$reflectionClass = new ReflectionClass($instance);
 			$properties = $reflectionClass->getProperties();
+
+			$classAttributeActions = static::getAttributeActions($reflectionClass);
+
 			foreach ($properties as $property) {
 				if ($property->isPublic()) {
-					$result[$property->name] = static::getPropertyInfo($property);
+					$result[$property->name] = static::getPropertyInfo($property, $classAttributeActions);
 				}
 			}
 
@@ -37,11 +41,20 @@ class PropertiesInfoProvider
 		return $cache[$instance::class];
 	}
 
-	protected static function getPropertyInfo(ReflectionProperty $property): PropertyInfo
+	/**
+	 * @param ReflectionProperty $property
+	 * @param array<array-key, AttributeAction> $classAttributeActions
+	 * @return PropertyInfo
+	 */
+	protected static function getPropertyInfo(ReflectionProperty $property, array $classAttributeActions): PropertyInfo
 	{
 		$propertyInfo = new PropertyInfo();
 
-		$propertyInfo->attributeActions = static::getPropertyAttributeActions($property);
+		$propertyInfo->attributeActions = array_merge(
+			$classAttributeActions,
+			static::getAttributeActions($property)
+		);
+
 		foreach ($propertyInfo->attributeActions as $action) {
 			$action->setPropertyInfo($propertyInfo);
 		}
@@ -54,11 +67,11 @@ class PropertiesInfoProvider
 		return $propertyInfo;
 	}
 
-	protected static function getPropertyAttributeActions(ReflectionProperty $property): array
+	protected static function getAttributeActions(ReflectionProperty|ReflectionClass $target): array
 	{
 		return array_map(
 			fn(ReflectionAttribute $attribute) => $attribute->newInstance(),
-			$property->getAttributes(AttributeAction::class, ReflectionAttribute::IS_INSTANCEOF)
+			$target->getAttributes(AttributeAction::class, ReflectionAttribute::IS_INSTANCEOF)
 		);
 	}
 

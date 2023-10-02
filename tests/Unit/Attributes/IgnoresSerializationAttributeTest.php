@@ -24,7 +24,28 @@ class IgnoresSerializationAttributeTest extends TestCase
 		};
 		$mapped = $class::map($data);
 		$this->assertSame($data['some'], $mapped->some);
+		$this->assertSame($data['some2'], $mapped->some2);
 		$this->assertSame($data['some3'], $mapped->some3);
 		$this->assertEmpty($mapped->toArray());
+	}
+	public function testIgnoreSerializationClass() {
+		$data = [
+			'some' => 'one',
+			'some2' => null,
+			'some3' => 0,
+		];
+		$class = new
+		#[IgnoresSerialization(IgnoresSerialization::EMPTY)]
+		class extends DataMapper {
+			public string $some;
+			public ?string $some2;
+			public ?int $some3;
+		};
+
+		$mapped = $class::map($data);
+		$this->assertSame($data['some'], $mapped->some);
+		$this->assertSame($data['some2'], $mapped->some2);
+		$this->assertSame($data['some3'], $mapped->some3);
+		$this->assertCount(1, $mapped->toArray());
 	}
 }

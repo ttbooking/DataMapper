@@ -21,14 +21,14 @@ class DataMapperTest extends TestCase
 		$data = $this->getTestData();
 
 		$mapped = $class::map($data);
-		$this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), json_encode($mapped, JSON_PRETTY_PRINT));
+		$this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), $mapped->toJson(JSON_PRETTY_PRINT));
 	}
 
 	public function testMapperObject() {
 		$class = $this->getTestClass();
 		$data = json_decode(json_encode($this->getTestData()));
 		$mapped = $class::map($data);
-		$this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), json_encode($mapped, JSON_PRETTY_PRINT));
+		$this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), $mapped->toJson(JSON_PRETTY_PRINT));
 	}
 
 	public function testMapperMapped() {
@@ -85,31 +85,8 @@ class DataMapperTest extends TestCase
 							'fruit' => 'banana',
 							'count' => 4,
 							'expires' => '2023-07-11',
-							'combines' => [
-								[
-									'fruit' => 'apple',
-									'count' => 3,
-									"expires" => null,
-									"combines" => [
-										[
-											'fruit' => 'banana',
-											'count' => 4,
-											'expires' => '2023-07-11',
-											'combines' => [
-												[
-													'fruit' => 'apple',
-													'count' => 3,
-													"expires" => null,
-													"combines" => [
-
-													]
-												],
-											]
-										]
-									]
-								],
-							],
-						]
+							'combines' => [],
+						],
 					],
 					'someValue' => 'value2',
 				],

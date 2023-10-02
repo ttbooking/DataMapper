@@ -8,9 +8,10 @@ use DataMapper\Interfaces\Mappable;
 use DataMapper\Services\ArraySerializer;
 use DataMapper\Services\MapperService;
 use DataMapper\Services\PropertiesInfoProvider;
+use JsonSerializable;
 use stdClass;
 
-abstract class DataMapper implements Mappable, \JsonSerializable
+abstract class DataMapper implements Mappable, JsonSerializable
 {
 
 	public function __construct() {}
