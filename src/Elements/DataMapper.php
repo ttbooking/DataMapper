@@ -45,8 +45,8 @@ abstract class DataMapper implements Mappable, JsonSerializable
 	public static function mapMany(iterable $values): array
 	{
 		$result = [];
-		foreach ($values as $value) {
-			$result[] = static::map($value);
+		foreach ($values as $key => $value) {
+			$result[$key] = static::map($value);
 		}
 		return $result;
 	}
