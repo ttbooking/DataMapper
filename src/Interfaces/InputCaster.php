@@ -6,5 +6,5 @@ use DataMapper\Elements\ObjectInfo\PropertyInfo;
 
 interface InputCaster
 {
-	public function castInput(PropertyInfo $propertyInfo, mixed $value): mixed;
+    public function castInput(PropertyInfo $propertyInfo, mixed $value): mixed;
 }

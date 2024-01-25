@@ -14,84 +14,84 @@ use stdClass;
 abstract class DataMapper implements Mappable, JsonSerializable
 {
 
-	public function __construct() {}
+    public function __construct() {}
 
-	/**
-	 * @throws UnsupportedDataException
-	 */
-	public static function map(mixed $value): static
-	{
-		if ($value instanceof static) {
-			return clone $value;
-		}
+    /**
+     * @throws UnsupportedDataException
+     */
+    public static function map(mixed $value): static
+    {
+        if ($value instanceof static) {
+            return clone $value;
+        }
 
-		if ($value instanceof stdClass) {
-			$value = (array)$value;
-		} else if (is_object($value)) {
-			$value = ArraySerializer::toArray($value);
-		}
+        if ($value instanceof stdClass) {
+            $value = (array) $value;
+        } elseif (is_object($value)) {
+            $value = ArraySerializer::toArray($value);
+        }
 
-		if (!is_array($value)) {
-			throw new UnsupportedDataException('Переданное значение не может быть обработано');
-			//may be need to assign empty array instead of exception
-		}
+        if (!is_array($value)) {
+            throw new UnsupportedDataException('Переданное значение не может быть обработано');
+            //may be need to assign empty array instead of exception
+        }
 
-		return MapperService::mapInto(new static(), $value);
-	}
+        return MapperService::mapInto(new static(), $value);
+    }
 
-	/**
-	 * @throws UnsupportedDataException
-	 */
-	public static function mapMany(iterable $values): array
-	{
-		$result = [];
-		foreach ($values as $key => $value) {
-			$result[$key] = static::map($value);
-		}
-		return $result;
-	}
+    /**
+     * @throws UnsupportedDataException
+     */
+    public static function mapMany(iterable $values): array
+    {
+        $result = [];
+        foreach ($values as $key => $value) {
+            $result[$key] = static::map($value);
+        }
+        return $result;
+    }
 
-	public function jsonSerialize(): array
-	{
-		return $this->toArray();
-	}
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
+    }
 
-	public function toArray(): array
-	{
-		$propertyInfos = PropertiesInfoProvider::getProperties($this);
+    public function toArray(): array
+    {
+        $propertyInfos = PropertiesInfoProvider::getProperties($this);
 
-		$result = [];
-		foreach ($propertyInfos as $propertyInfo) {
+        $result = [];
+        foreach ($propertyInfos as $propertyInfo) {
 
-			$value = $this->{$propertyInfo->name} ?? null;
+            $value = $this->{$propertyInfo->name} ?? null;
 
-			if ($propertyInfo->serializationInfo->ignoresSerialization) {
+            if ($propertyInfo->serializationInfo->ignoresSerialization) {
 
-				$ignore = match ($propertyInfo->serializationInfo->ignoreIf) {
-					IgnoresSerialization::ANY => true,
-					IgnoresSerialization::NULL => is_null($value),
-					IgnoresSerialization::EMPTY => empty($value),
-				};
+                $ignore = match ($propertyInfo->serializationInfo->ignoreIf) {
+                    IgnoresSerialization::ANY => true,
+                    IgnoresSerialization::NULL => is_null($value),
+                    IgnoresSerialization::EMPTY => empty($value),
+                };
 
-				if ($ignore) {
-					continue;
-				}
-			}
+                if ($ignore) {
+                    continue;
+                }
+            }
 
-			$propertySerializeName = $propertyInfo->serializationInfo->serializeToName ?? $propertyInfo->name;
+            $propertySerializeName = $propertyInfo->serializationInfo->serializeToName ?? $propertyInfo->name;
 
 
-			foreach ($propertyInfo->serializationInfo->outputCasters as $caster) {
-				$value = $caster->castOutput($propertyInfo, $value);
-			}
+            foreach ($propertyInfo->serializationInfo->outputCasters as $caster) {
+                $value = $caster->castOutput($propertyInfo, $value);
+            }
 
-			$result[$propertySerializeName] = ArraySerializer::toArray($value);
-		}
-		return $result;
-	}
+            $result[$propertySerializeName] = ArraySerializer::toArray($value);
+        }
+        return $result;
+    }
 
-	public function toJson(int $options = 0): string
-	{
-		return json_encode($this->toArray(), $options);
-	}
+    public function toJson(int $options = 0): string
+    {
+        return json_encode($this->toArray(), $options);
+    }
 }

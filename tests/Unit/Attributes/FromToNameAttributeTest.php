@@ -10,20 +10,22 @@ use PHPUnit\Framework\TestCase;
 class FromToNameAttributeTest extends TestCase
 {
 
-	public function testFromToName() {
-		$data = [
-			'somethingString' => 'hello',
-		];
+    public function testFromToName()
+    {
+        $data = [
+            'somethingString' => 'hello',
+        ];
 
-		$class = new class extends DataMapper {
-			#[FromName('somethingString'), ToName('somethingString')]
-			public string $string;
-		};
+        $class = new class extends DataMapper
+        {
+            #[FromName('somethingString'), ToName('somethingString')]
+            public string $string;
+        };
 
-		$mapped = $class::map($data);
-		$this->assertSame($data['somethingString'], $mapped->string);
-		$this->assertSame($data, $mapped->toArray());
-	}
+        $mapped = $class::map($data);
+        $this->assertSame($data['somethingString'], $mapped->string);
+        $this->assertSame($data, $mapped->toArray());
+    }
 
 
 }
