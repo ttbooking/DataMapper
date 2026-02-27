@@ -17,7 +17,7 @@ class ArraySerializer
 
             if (is_object($value)) {
                 if (is_iterable($value)) {
-                    $value = iterator_to_array($value);
+                    return iterator_to_array($value);
                 } elseif ($value instanceof JsonSerializable) {
                     return $value->jsonSerialize();
                 } elseif (method_exists($value, 'toArray')) {
@@ -25,15 +25,15 @@ class ArraySerializer
                 } elseif ($value instanceof BackedEnum) {
                     return $value->value;
                 } else {
-                    $value = (array) $value;
+                    return array_map(
+                        static fn(mixed $v) => static::toArray($v),
+                        (array) $value
+                    );
                 }
             }
 
             if (is_array($value)) {
-                return array_map(
-                    static fn(mixed $v) => static::toArray($v),
-                    $value
-                );
+                return $value;
             }
         }
         return null;
