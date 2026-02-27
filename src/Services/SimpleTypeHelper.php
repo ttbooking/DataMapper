@@ -4,14 +4,19 @@ namespace DataMapper\Services;
 
 class SimpleTypeHelper
 {
+    const REAL_SIMPLE_TYPE = [
+        'boolean' => 'bool',
+        'integer' => 'int',
+    ];
+
     const ALLOW_SIMPLE_TYPE = [
-        'boolean',
         'bool',
-        'integer',
         'int',
         'float',
         'double',
         'string',
+        'boolean',
+        'integer',
     ];
 
     public static function isSimpleType(string $type): bool
@@ -30,4 +35,11 @@ class SimpleTypeHelper
             'string' => (string) $value,
         };
     }
+
+    public static function getTrueType(mixed $value): string
+    {
+        $result = gettype($value);
+        return self::REAL_SIMPLE_TYPE[$result] ?? $result;
+    }
+
 }

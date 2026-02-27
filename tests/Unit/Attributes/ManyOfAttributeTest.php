@@ -13,17 +13,20 @@ class ManyOfAttributeTest extends TestCase
     {
 
         $data = [
-            'collection' => [
-                [
+            'collection' => new MyCollection([
+                1 => [
                     'some' => 'one',
-                ]
-            ],
+                ],
+                3 => [
+                    'some' => 2,
+                ],
+            ]),
         ];
         $mapped = SomeCollection::map($data);
         $this->assertNotEmpty($mapped->collection);
-        foreach ($mapped->collection as $someItem) {
+        foreach ($mapped->collection as $index => $someItem) {
             $this->assertInstanceOf(Some::class, $someItem);
-            $this->assertSame('one', $someItem->some);
+            $this->assertSame($data['collection']->get($index)['some'], $someItem->some);
         }
     }
 
@@ -43,22 +46,62 @@ class ManyOfAttributeTest extends TestCase
     public function testEmptyCollection()
     {
         $data = [
-            'collection' => []
+            'collection' => [
+
+            ]
         ];
         $mapped = SomeCollection::map($data);
         $this->assertSame([], $mapped->collection);
+    }
+}
+class MyCollection implements \Iterator {
+
+    private int $index = 0;
+
+    public function __construct(
+        public array $data = []
+    ) {}
+
+    public function get(int|string $key, $default = null)
+    {
+        return $this->data[$key] ?? $default;
+    }
+
+    public function current(): mixed
+    {
+        return array_values($this->data)[$this->index];
+    }
+
+    public function next(): void
+    {
+        $this->index++;
+    }
+
+    public function key(): mixed
+    {
+        return array_keys($this->data)[$this->index];
+    }
+
+    public function valid(): bool
+    {
+        return count($this->data) > $this->index;
+    }
+
+    public function rewind(): void
+    {
+        $this->index = 0;
     }
 }
 
 class SomeCollection extends DataMapper
 {
     #[ManyOf(Some::class)]
-    public array $collection;
+    public array|MyCollection $collection;
 }
 
 class Some extends DataMapper
 {
-    public string $some;
+    public string|int $some;
 }
 
 /**

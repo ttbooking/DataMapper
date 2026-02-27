@@ -3,10 +3,11 @@
 namespace DataMapper\Services;
 
 use BackedEnum;
+use JsonSerializable;
 
 class ArraySerializer
 {
-    public static function toArray($value)
+    public static function toArray(mixed $value)
     {
         if (!is_null($value)) {
 
@@ -15,8 +16,9 @@ class ArraySerializer
             }
 
             if (is_object($value)) {
-
-                if ($value instanceof \JsonSerializable) {
+                if (is_iterable($value)) {
+                    $value = iterator_to_array($value);
+                } elseif ($value instanceof JsonSerializable) {
                     return $value->jsonSerialize();
                 } elseif (method_exists($value, 'toArray')) {
                     return $value->toArray();
@@ -28,11 +30,10 @@ class ArraySerializer
             }
 
             if (is_array($value)) {
-                $newValue = [];
-                foreach ($value as $k => $v) {
-                    $newValue[$k] = static::toArray($v);
-                }
-                return $newValue;
+                return array_map(
+                    static fn(mixed $v) => static::toArray($v),
+                    $value
+                );
             }
         }
         return null;

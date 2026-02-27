@@ -11,8 +11,9 @@ class FieldCaster
 {
     public static function castValue(PropertyInfo $propertyInfo, mixed $value): mixed
     {
-        $valueType = gettype($value);
+        $valueType = SimpleTypeHelper::getTrueType($value);
         $valueSimpleType = SimpleTypeHelper::isSimpleType($valueType);
+
         if (in_array($valueType, $propertyInfo->propertyTypes)) {
             /**
              * Кастинг не нужен, если тип уже подходит под тип поля
