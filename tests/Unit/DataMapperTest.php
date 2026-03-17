@@ -36,7 +36,8 @@ class DataMapperTest extends TestCase
     {
         $class = $this->getTestClass();
         $data = $this->getTestData();
-        $mapped = $class::map($class::map($data));
+        $mappable = $class::map($data);
+        $mapped = $class::map($mappable->toArray());
         $this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), json_encode($mapped, JSON_PRETTY_PRINT));
     }
 

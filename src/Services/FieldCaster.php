@@ -26,7 +26,10 @@ class FieldCaster
              */
             foreach ($propertyInfo->propertyTypes as $propertyType) {
                 if ($value instanceof $propertyType) {
-                    return $value;
+                    if (is_a($propertyType, Mappable::class, true)) {
+                        return $propertyType::map($value);
+                    }
+                    return self::cloneDeep($value);
                 }
             }
 
@@ -80,5 +83,10 @@ class FieldCaster
          * Простите, мы сделали все, что смогли
          */
         return null;
+    }
+
+    public static function cloneDeep(mixed $value): mixed
+    {
+        return unserialize(serialize($value));
     }
 }

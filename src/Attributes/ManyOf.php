@@ -39,7 +39,7 @@ class ManyOf implements AttributeAction
             }
             return $result;
         } elseif (is_a($this->type, Mappable::class, true)) {
-            return $this->type::mapMany(ArraySerializer::toArray($value));
+            return $this->type::mapMany(ArraySerializer::toIterableArray($value));
         }
 
         throw new CannotCastException(

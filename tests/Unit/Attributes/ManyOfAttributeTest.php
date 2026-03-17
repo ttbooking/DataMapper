@@ -15,10 +15,16 @@ class ManyOfAttributeTest extends TestCase
         $data = [
             'collection' => new MyCollection([
                 1 => [
-                    'some' => 'one',
+                    'some' => Foo::map(['foo' => Bam::map(['bam' => 'one'])]),
                 ],
                 3 => [
-                    'some' => 2,
+                    'some' => Foo::map(['foo' => Baz::map(['baz' => 2])]),
+                ],
+                5 => [
+                    'some' => Bar::map(['bar' => Baz::map(['baz' => 'some'])]),
+                ],
+                7 => [
+                    'some' => Bar::map(['bar' => Bam::map(['bam' => 4])]),
                 ],
             ]),
         ];
@@ -26,7 +32,28 @@ class ManyOfAttributeTest extends TestCase
         $this->assertNotEmpty($mapped->collection);
         foreach ($mapped->collection as $index => $someItem) {
             $this->assertInstanceOf(Some::class, $someItem);
-            $this->assertSame($data['collection']->get($index)['some'], $someItem->some);
+            $item = $data['collection']->get($index)['some'];
+            $this->assertInstanceOf($item ? $item::class : null, $someItem->some);
+
+            $this->assertNotSame($item, $someItem->some);
+            if ($item instanceof Foo) {
+                $this->assertInstanceOf($item->foo::class, $someItem->some->foo);
+                $this->assertNotSame($item->foo, $someItem->some->foo);
+            } elseif ($item instanceof Bar) {
+                $this->assertInstanceOf($item->bar::class, $someItem->some->bar);
+                $this->assertNotSame($item->bar, $someItem->some->bar);
+            }
+        }
+        $resultToArray = $mapped->toArray();
+        $this->assertIsArray($resultToArray);
+        foreach ($resultToArray['collection'] as $item) {
+            $this->assertIsArray($item);
+            $this->assertIsArray($item['some']);
+            if (isset($item['some']['bar'])) {
+                $this->assertIsArray($item['some']['bar']);
+            } elseif (isset($item['some']['foo'])) {
+                $this->assertIsArray($item['some']['foo']);
+            }
         }
     }
 
@@ -101,7 +128,24 @@ class SomeCollection extends DataMapper
 
 class Some extends DataMapper
 {
-    public string|int $some;
+    public Foo|Bar $some;
+}
+
+class Foo extends DataMapper
+{
+    public Bam|Baz $foo;
+}
+class Bar extends DataMapper
+{
+    public Bam|Baz $bar;
+}
+class Baz extends DataMapper
+{
+    public string|int $baz;
+}
+class Bam extends DataMapper
+{
+    public string|int $bam;
 }
 
 /**
